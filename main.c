@@ -68,10 +68,13 @@ int delete_list(ArrayList *list) {
   int size = list->size;
   for (int i = 0; i < size; i++) {
     if (entry[i]) {
-      if (entry[i]->name)
+      if (entry[i]->name) {
         free(entry[i]->name);
-      if (entry[i]->lastname)
+      }
+      if (entry[i]->lastname) {
         free(entry[i]->lastname);
+      }
+      free(entry[i]);
     }
   }
   list->entries = NULL;
@@ -91,6 +94,7 @@ ArrayList *extend(ArrayList *array_list) {
   for (int i = 0; i < size; i++) {
     entry[i] = array_list->entries[i];
   }
+  free(array_list->entries);
   free(array_list);
   return new_arr_list;
 }
@@ -110,6 +114,7 @@ ArrayList *shrink(ArrayList *array_list) {
   for (int i = 0; i < size; i++) {
     entry[i] = array_list->entries[i];
   }
+  free(array_list->entries);
   free(array_list);
   return new_arr_list;
 }
@@ -117,9 +122,8 @@ ArrayList *shrink(ArrayList *array_list) {
 void move_elements_right(ArrayList **array_list, int index) {
   ArrayList *arr = *array_list;
   int size = arr->size;
-  int start = index - 1;
   Entry **entrys = arr->entries;
-  for (int i = size - 1; i >= start; i--) {
+  for (int i = size - 1; i >= index; i--) {
     entrys[i + 1] = entrys[i];
   }
   entrys[index] = NULL;
@@ -129,8 +133,13 @@ void move_elements_left(ArrayList **array_list, int index) {
   ArrayList *arr = *array_list;
   int size = arr->size;
   Entry **entrys = arr->entries;
-  AssertNull(entrys[index], ) Entry *tmp = entrys[index];
+  AssertNull(entrys[index], );
+  Entry *tmp = entrys[index];
   entrys[index] = NULL;
+  if (tmp->name)
+    free(tmp->name);
+  if (tmp->lastname)
+    free(tmp->lastname);
   free(tmp);
   for (int i = index + 1; i < size; i++) {
     entrys[i - 1] = entrys[i];
@@ -234,13 +243,13 @@ char *strip(char *string, char c) {
   if (!new_str) {
     return NULL;
   }
-  int tracker, j = 0;
+  int tracker = 0, j = 0;
   for (j = 0; j < len; j++) {
     if (string[j] != c) {
       new_str[tracker++] = string[j];
     }
   }
-  new_str[j] = '\0';
+  new_str[tracker] = '\0';
   return new_str;
 }
 
@@ -249,7 +258,6 @@ int parse_command(ArrayList **array, char *command) {
   AssertNull(array_list, -1);
   AssertNull(command, -1);
   char *token = strtok(command, " ");
-  Entry *entry = (Entry *)malloc(sizeof(Entry));
   int index = -1;
   char *new_token = strip(token, '\n');
   if (!strcmp(new_token, "insertToHead")) {
@@ -283,6 +291,7 @@ int parse_command(ArrayList **array, char *command) {
     AssertNull(new_name, -1);
     index = find_pos(array_list, new_name);
     free(new_token);
+    free(new_name);
     printf("%d\n\n", index);
     return index;
   } else if (!strcmp(new_token, "deleteFromPosition")) {
@@ -309,20 +318,38 @@ int parse_command(ArrayList **array, char *command) {
     free(new_token);
     return -1;
   }
+  free(new_token);
+  Entry *entry = (Entry *)malloc(sizeof(Entry));
   char *name = strtok(NULL, " ");
   AssertNull(name, -1);
   entry->name = (char *)malloc(strlen(name) + 1);
+  AssertNull(entry->name, -1);
   strcpy(entry->name, name);
   char *last_name = strtok(NULL, " ");
   AssertNull(last_name, -1);
   entry->lastname = (char *)malloc(strlen(last_name) + 1);
+  if (entry->lastname == NULL) {
+    free(entry->name);
+    free(entry);
+    return -1;
+  }
   strcpy(entry->lastname, last_name);
   char *height = strtok(NULL, " ");
-  AssertNull(height, -1);
+  if (!height) {
+    free(entry->name);
+    free(entry->lastname);
+    free(entry);
+    return -1;
+  }
   float height_f = atof(height);
   entry->height = height_f;
   char *age = strtok(NULL, " ");
-  AssertNull(age, -1);
+  if (!age) {
+    free(entry->name);
+    free(entry->lastname);
+    free(entry);
+    return -1;
+  }
   float age_f = atoi(age);
   entry->age = age_f;
   *array = insert(array_list, entry, index);
@@ -334,7 +361,7 @@ int main(int argc, char *argv[]) {
     ArrayList *list = init(2);
     FILE *fp = fopen(argv[i], "r");
     if (!fp) {
-      fprintf(stderr, "Err happened when openning file");
+      fprintf(stderr, "Err happened when openning file\n");
       delete_list(list);
       free(list);
       return 1;

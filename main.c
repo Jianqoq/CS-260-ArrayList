@@ -276,7 +276,7 @@ int parse_command(ArrayList **array, char *command) {
     printf("\n");
     return 0;
   } else if (!strcmp(new_token, "printListInfo")) {
-    printf("ArrayList %p {\n\tsize: %d,\n\tcapacity: %d\n}\n", array_list,
+    printf("size:%d,\n\tcapacity:%d\n}\n", array_list,
            array_list->size, array_list->capacity);
     free(new_token);
     printf("\n");

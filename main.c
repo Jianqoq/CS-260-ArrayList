@@ -46,9 +46,7 @@ typedef struct {
 
 ArrayList *init(int capacity) {
   ArrayList *list = (ArrayList *)malloc(sizeof(ArrayList) * 1);
-  if (!list) {
-    return NULL;
-  }
+  AssertNull(list, NULL);
   list->capacity = capacity;
   list->size = 0;
   Entry **entry = (Entry **)malloc(sizeof(Entry *) * capacity);
@@ -62,9 +60,7 @@ ArrayList *init(int capacity) {
 
 int delete_list(ArrayList *list) {
   Entry **entry = list->entries;
-  if (!entry) {
-    return 0;
-  }
+  AssertNull(entry, 0);
   int size = list->size;
   for (int i = 0; i < size; i++) {
     if (entry[i]) {
@@ -86,9 +82,7 @@ ArrayList *extend(ArrayList *array_list) {
   int size = array_list->size;
   int capacity = array_list->capacity;
   ArrayList *new_arr_list = init(capacity * 2);
-  if (!new_arr_list) {
-    return NULL;
-  }
+  AssertNull(new_arr_list, NULL);
   new_arr_list->size = size;
   Entry **entry = new_arr_list->entries;
   for (int i = 0; i < size; i++) {
@@ -106,9 +100,7 @@ ArrayList *shrink(ArrayList *array_list) {
     return array_list;
   }
   ArrayList *new_arr_list = init(capacity / 2);
-  if (!new_arr_list) {
-    return NULL;
-  }
+  AssertNull(new_arr_list, NULL);
   new_arr_list->size = size;
   Entry **entry = new_arr_list->entries;
   for (int i = 0; i < size; i++) {
@@ -347,7 +339,7 @@ int parse_command(ArrayList **array, char *command) {
     free(entry);
     return -1;
   }
-  float age_f = atoi(age);
+  int age_f = atoi(age);
   entry->age = age_f;
   *array = insert(array_list, entry, index);
   return 0;

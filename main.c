@@ -273,13 +273,10 @@ int parse_command(ArrayList **array, char *command) {
              entry->height, entry->age);
     }
     free(new_token);
-    printf("\n");
     return 0;
   } else if (!strcmp(new_token, "printListInfo")) {
-    printf("size:%d, capacity:%d\n", array_list,
-           array_list->size, array_list->capacity);
+    printf("size:%d, capacity:%d\n", array_list->size, array_list->capacity);
     free(new_token);
-    printf("\n");
     return 0;
   } else if (!strcmp(new_token, "insertToPosition")) {
     char *index_str = strtok(NULL, " ");
@@ -292,7 +289,7 @@ int parse_command(ArrayList **array, char *command) {
     index = find_pos(array_list, new_name);
     free(new_token);
     free(new_name);
-    printf("%d\n\n", index);
+    printf("%d\n", index);
     return index;
   } else if (!strcmp(new_token, "deleteFromPosition")) {
     char *index_str = strtok(NULL, " ");
@@ -314,7 +311,7 @@ int parse_command(ArrayList **array, char *command) {
     free(new_token);
     return 0;
   } else {
-    fprintf(stderr, "Invalid command: <%s>\n\n", new_token);
+    fprintf(stderr, "Invalid command: <%s>\n", new_token);
     free(new_token);
     return -1;
   }

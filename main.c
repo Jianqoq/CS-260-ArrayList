@@ -269,14 +269,14 @@ int parse_command(ArrayList **array, char *command) {
     Entry **entry_list = array_list->entries;
     for (int i = 0; i < size; i++) {
       Entry *entry = entry_list[i];
-      printf("[%d]\t%s\t%s\t\t%0.2f\t%d\n", i, entry->name, entry->lastname,
+      printf("[%d]\t%s\t%s\t%0.2f\t%d\n", i, entry->name, entry->lastname,
              entry->height, entry->age);
     }
     free(new_token);
     printf("\n");
     return 0;
   } else if (!strcmp(new_token, "printListInfo")) {
-    printf("size:%d,\n\tcapacity:%d\n}\n", array_list,
+    printf("size:%d, capacity:%d\n", array_list,
            array_list->size, array_list->capacity);
     free(new_token);
     printf("\n");
